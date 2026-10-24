@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import {
   fontFamilyOptions,
@@ -22,105 +22,98 @@ import styles from './ArticleParamsForm.module.scss';
 
 type ArticleParamsFormProps = {
   isOpen: boolean;
-  onSubmit: (data: ArticleStateType) => void;
-  onReset?: () => void;
-  initialData?: ArticleStateType;
+  onClose: () => void;
+  onChange: (state: ArticleStateType) => void;
 };
 
 export const ArticleParamsForm = ({
   isOpen,
-  onSubmit,
-  onReset,
-  initialData,
+  onClose,
+  onChange,
 }: ArticleParamsFormProps): React.JSX.Element => {
-  const [values, setValues] = useState<ArticleStateType>(
-    initialData ?? defaultArticleState
-  );
+  const [values, setValues] = useState<ArticleStateType>(defaultArticleState);
+
+  const closeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleMouseDown = (e: MouseEvent): void => {
+      if (closeRef.current && !closeRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+
+    return (): void => document.removeEventListener('mousedown', handleMouseDown);
+  }, [isOpen, onClose]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    onSubmit(values);
+    onChange(values);
+    onClose();
   };
 
   const handleReset = (): void => {
-    if (onReset) onReset();
+    onChange(defaultArticleState);
     setValues(defaultArticleState);
   };
 
-  const setField = (
-    key: keyof ArticleStateType,
-    newValue: ArticleStateType[keyof ArticleStateType]
-  ): void => {
-    setValues((prev) => ({
-      ...prev,
-      [key]: newValue,
-    }));
-  };
-
   return (
-    <aside className={clsx(styles.container, isOpen && styles.container_open)}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <Text size={31} weight={800} uppercase={true}>
-          Задайте параметры
-        </Text>
+    <div ref={closeRef}>
+      <aside className={clsx(styles.container, isOpen && styles.container_open)}>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <Text size={31} weight={800} uppercase={true}>
+            Задайте параметры
+          </Text>
 
-        <div>
           <Select
-            title="Шрифт"
+            title="шрифт"
             selected={values.fontFamilyOption}
             options={fontFamilyOptions}
-            placeholder="Выберите шрифт"
-            onChange={(selected) => setField('fontFamilyOption', selected)}
+            onChange={(option) => setValues({ ...values, fontFamilyOption: option })}
           />
-        </div>
 
-        <div>
           <RadioGroup
             name="fontSize"
-            title="Размер шрифта"
+            title="размер шрифта"
             options={fontSizeOptions}
             selected={values.fontSizeOption}
-            onChange={(selected) => setField('fontSizeOption', selected)}
+            onChange={(option) => setValues({ ...values, fontSizeOption: option })}
           />
-        </div>
 
-        <div>
           <Select
-            title="Цвет шрифта"
+            title="цвет шрифта"
             selected={values.fontColor}
             options={fontColors}
-            placeholder="Выберите цвет"
-            onChange={(selected) => setField('fontColor', selected)}
+            onChange={(option) => setValues({ ...values, fontColor: option })}
           />
-        </div>
 
-        <Separator />
+          <Separator />
 
-        <div>
           <Select
-            title="Цвет фона"
+            title="цвет фона"
             selected={values.backgroundColor}
             options={backgroundColors}
             placeholder="Выберите фон"
-            onChange={(selected) => setField('backgroundColor', selected)}
+            onChange={(option) => setValues({ ...values, backgroundColor: option })}
           />
-        </div>
 
-        <div>
           <Select
-            title="Ширина контента"
+            title="ширина контента"
             selected={values.contentWidth}
             options={contentWidthArr}
             placeholder="Выберите ширину"
-            onChange={(selected) => setField('contentWidth', selected)}
+            onChange={(option) => setValues({ ...values, contentWidth: option })}
           />
-        </div>
 
-        <div className={styles.bottomContainer}>
-          <Button title="Сбросить" onClick={handleReset} type="clear" />
-          <Button title="Применить" htmlType="submit" type="apply" />
-        </div>
-      </form>
-    </aside>
+          <div className={styles.bottomContainer}>
+            <Button title="Сбросить" onClick={handleReset} type="clear" />
+            <Button title="Применить" htmlType="submit" type="apply" />
+          </div>
+        </form>
+      </aside>
+    </div>
   );
 };

@@ -1,7 +1,7 @@
 import { defaultArticleState } from '@/constants/articleProps.ts';
 import { ArrowButton } from '@/ui/arrow-button';
 import { clsx } from 'clsx';
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 
 import { ArticleParamsForm } from '@components/article-params-form';
 
@@ -19,16 +19,7 @@ export const App = (): React.JSX.Element => {
     '--font-color': currentState.fontColor.value ?? '',
     '--container-width': currentState.contentWidth.value ?? '',
     '--bg-color': currentState.backgroundColor.value ?? '',
-  } as React.CSSProperties;
-
-  const handleApply = (data: typeof defaultArticleState): void => {
-    setCurrentState(data);
-    setIsOpen(false);
-  };
-
-  const handleReset = (): void => {
-    setCurrentState(defaultArticleState);
-  };
+  } as CSSProperties;
 
   return (
     <main className={clsx(styles.main)} style={containerStyle}>
@@ -40,9 +31,8 @@ export const App = (): React.JSX.Element => {
 
       <ArticleParamsForm
         isOpen={isOpen}
-        onSubmit={handleApply}
-        onReset={handleReset}
-        initialData={currentState}
+        onClose={() => setIsOpen(false)}
+        onChange={setCurrentState}
       />
 
       <Article />
