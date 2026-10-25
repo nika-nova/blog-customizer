@@ -22,11 +22,11 @@ import { useSidebarClose } from './useSidebarClose';
 import styles from './ArticleParamsForm.module.scss';
 
 type ArticleParamsFormProps = {
-  onChange: (state: ArticleStateType) => void;
+  onApply: (state: ArticleStateType) => void;
 };
 
 export const ArticleParamsForm = ({
-  onChange,
+  onApply,
 }: ArticleParamsFormProps): React.JSX.Element => {
   const [isOpen, setIsOpen] = useState(false);
   const [values, setValues] = useState<ArticleStateType>(defaultArticleState);
@@ -43,12 +43,12 @@ export const ArticleParamsForm = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    onChange(values);
+    onApply(values);
     setIsOpen(false);
   };
 
   const handleReset = (): void => {
-    onChange(defaultArticleState);
+    onApply(defaultArticleState);
     setValues(defaultArticleState);
   };
 

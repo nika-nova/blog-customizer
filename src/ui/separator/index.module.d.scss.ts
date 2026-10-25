@@ -1,4 +1,4 @@
 declare const classNames: {
-  readonly separator: 'separator';
+  readonly separator: "separator";
 };
 export default classNames;

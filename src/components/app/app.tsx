@@ -21,7 +21,7 @@ export const App = (): React.JSX.Element => {
 
   return (
     <main className={clsx(styles.main)} style={containerStyle}>
-      <ArticleParamsForm onChange={setCurrentState} />
+      <ArticleParamsForm onApply={setCurrentState} />
 
       <Article />
     </main>
